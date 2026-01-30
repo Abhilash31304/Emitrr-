@@ -1,0 +1,42 @@
+.controls {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  display: flex;
+  gap: 1rem;
+  z-index: 100;
+}
+
+.controls__group {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.controls__btn {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--node-border);
+  border-radius: 4px;
+  background-color: white;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: background-color 0.2s ease, opacity 0.2s ease;
+}
+
+.controls__btn:hover:not(:disabled) {
+  background-color: var(--canvas-bg);
+}
+
+.controls__btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.controls__btn--primary {
+  background-color: var(--action-color);
+  color: white;
+  border-color: var(--action-color);
+}
+
+.controls__btn--primary:hover:not(:disabled) {
+  background-color: #3182ce;
+}

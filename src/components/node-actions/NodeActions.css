@@ -1,0 +1,69 @@
+.node-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.node-actions__btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.node-actions__btn:hover {
+  transform: scale(1.1);
+}
+
+.node-actions__btn--add {
+  background-color: var(--action-color);
+  color: white;
+}
+
+.node-actions__btn--edit {
+  background-color: var(--branch-color);
+  color: white;
+}
+
+.node-actions__btn--delete {
+  background-color: var(--end-color);
+  color: white;
+}
+
+.node-actions__add-wrapper {
+  position: relative;
+}
+
+.node-actions__menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 0.5rem;
+  background-color: white;
+  border: 1px solid var(--node-border);
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 10;
+  overflow: hidden;
+}
+
+.node-actions__menu button {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 1rem;
+  border: none;
+  background: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 0.2s ease;
+}
+
+.node-actions__menu button:hover {
+  background-color: var(--canvas-bg);
+}

@@ -1,0 +1,35 @@
+:root {
+  /* Colors */
+  --canvas-bg: #f5f7fa;
+  --node-bg: #ffffff;
+  --node-border: #e2e8f0;
+  
+  /* Node type colors */
+  --start-color: #48bb78;
+  --action-color: #4299e1;
+  --branch-color: #ed8936;
+  --end-color: #f56565;
+  
+  /* Text colors */
+  --text-primary: #2d3748;
+  --text-secondary: #4a5568;
+  --text-muted: #718096;
+  
+  /* Connection line */
+  --connection-color: #a0aec0;
+  --connection-width: 2px;
+  
+  /* Spacing */
+  --node-gap: 2rem;
+  --branch-gap: 3rem;
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  
+  /* Transitions */
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.2s ease;
+  --transition-slow: 0.3s ease;
+}

@@ -1,0 +1,50 @@
+.workflow-node {
+  background-color: var(--node-bg);
+  border: 2px solid var(--node-border);
+  border-radius: 8px;
+  padding: 1rem;
+  min-width: 150px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.workflow-node:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.workflow-node--action {
+  border-color: var(--action-color);
+}
+
+.workflow-node--branch {
+  border-color: var(--branch-color);
+}
+
+.workflow-node--end {
+  border-color: var(--end-color);
+}
+
+.workflow-node--start {
+  border-color: var(--start-color);
+}
+
+.workflow-node__header {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.workflow-node__content {
+  font-weight: 500;
+}
+
+.workflow-node__label {
+  font-size: 1rem;
+}
+
+.workflow-node__actions {
+  margin-top: 0.75rem;
+  display: flex;
+  gap: 0.5rem;
+}
