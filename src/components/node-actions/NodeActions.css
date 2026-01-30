@@ -1,69 +1,181 @@
+/* ========================================
+   Node Action Buttons & Dropdown
+   ======================================== */
+
 .node-actions {
   display: flex;
-  gap: 0.5rem;
   align-items: center;
+  gap: 4px;
 }
 
-.node-actions__btn {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  border: none;
-  cursor: pointer;
-  font-size: 1rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background-color 0.2s ease, transform 0.2s ease;
-}
-
-.node-actions__btn:hover {
-  transform: scale(1.1);
-}
-
-.node-actions__btn--add {
-  background-color: var(--action-color);
-  color: white;
-}
-
-.node-actions__btn--edit {
-  background-color: var(--branch-color);
-  color: white;
-}
-
-.node-actions__btn--delete {
-  background-color: var(--end-color);
-  color: white;
-}
-
-.node-actions__add-wrapper {
+.node-actions__wrapper {
   position: relative;
 }
 
-.node-actions__menu {
+/* ----------------------------------------
+   Action Buttons
+   ---------------------------------------- */
+.node-actions__btn {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background-color: transparent;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.node-actions__btn:hover {
+  background-color: var(--bg-secondary);
+  color: var(--text-secondary);
+}
+
+.node-actions__btn--add:hover {
+  background-color: var(--primary-50);
+  color: var(--primary-600);
+}
+
+.node-actions__btn--delete:hover {
+  background-color: var(--destructive-50);
+  color: var(--destructive-600);
+}
+
+/* Delete confirmation state */
+.node-actions__btn--confirm {
+  background-color: var(--destructive-500);
+  border-color: var(--destructive-500);
+  color: var(--text-inverse);
+  animation: confirmPulse 0.3s ease;
+}
+
+.node-actions__btn--confirm:hover {
+  background-color: var(--destructive-600);
+  border-color: var(--destructive-600);
+  color: var(--text-inverse);
+}
+
+@keyframes confirmPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+/* ----------------------------------------
+   Dropdown Menu
+   ---------------------------------------- */
+.node-actions__dropdown {
   position: absolute;
-  top: 100%;
-  left: 0;
-  margin-top: 0.5rem;
-  background-color: white;
-  border: 1px solid var(--node-border);
-  border-radius: 4px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  z-index: 10;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 100;
+}
+
+.node-actions__dropdown-arrow {
+  position: absolute;
+  top: -6px;
+  right: 8px;
+  width: 12px;
+  height: 12px;
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-light);
+  border-right: none;
+  border-bottom: none;
+  transform: rotate(45deg);
+}
+
+.node-actions__dropdown-content {
+  position: relative;
+  width: 240px;
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-dropdown);
   overflow: hidden;
 }
 
-.node-actions__menu button {
-  display: block;
-  width: 100%;
-  padding: 0.5rem 1rem;
-  border: none;
-  background: none;
-  cursor: pointer;
-  text-align: left;
-  transition: background-color 0.2s ease;
+.node-actions__dropdown-header {
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: 11px;
+  font-weight: var(--font-semibold);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background-color: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-light);
 }
 
-.node-actions__menu button:hover {
-  background-color: var(--canvas-bg);
+/* ----------------------------------------
+   Dropdown Items
+   ---------------------------------------- */
+.node-actions__dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background-color var(--transition-fast);
+}
+
+.node-actions__dropdown-item:hover {
+  background-color: var(--bg-secondary);
+}
+
+.node-actions__dropdown-item:not(:last-child) {
+  border-bottom: 1px solid var(--border-light);
+}
+
+/* Icon */
+.node-actions__dropdown-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.node-actions__dropdown-icon--action {
+  background-color: var(--action-bg);
+  color: var(--action-color);
+}
+
+.node-actions__dropdown-icon--branch {
+  background-color: var(--branch-bg);
+  color: var(--branch-color);
+}
+
+.node-actions__dropdown-icon--end {
+  background-color: var(--end-bg);
+  color: var(--end-color);
+}
+
+/* Text */
+.node-actions__dropdown-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.node-actions__dropdown-title {
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--text-primary);
+}
+
+.node-actions__dropdown-desc {
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

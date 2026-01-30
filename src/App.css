@@ -1,6 +1,67 @@
+/* ========================================
+   App Layout
+   ======================================== */
+
 .app {
   min-height: 100vh;
-  background-color: var(--canvas-bg);
+  background-color: var(--bg-canvas);
+  display: flex;
+  flex-direction: column;
+}
+
+/* ----------------------------------------
+   Header
+   ---------------------------------------- */
+.app-header {
+  background-color: var(--bg-primary);
+  border-bottom: 1px solid var(--border-light);
+  padding: 14px var(--spacing-xl);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.app-header__title {
+  font-size: var(--text-lg);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.app-header__icon {
+  width: 22px;
+  height: 22px;
+  color: var(--primary-500);
+}
+
+/* ----------------------------------------
+   Canvas Wrapper
+   ---------------------------------------- */
+.canvas-wrapper {
+  flex: 1;
+  padding: var(--spacing-xl) var(--spacing-xl) 60px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  overflow: auto;
+}
+
+/* ========================================
+   Node Tree Structure
+   Vertical tree layout with connectors
+   ======================================== */
+
+.node-tree {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 0 var(--spacing-xl);
 }
 
 .node-container {
@@ -10,20 +71,9 @@
   position: relative;
 }
 
-.node-container::before {
-  content: '';
-  position: absolute;
-  top: -var(--node-gap);
-  left: 50%;
-  width: var(--connection-width);
-  height: var(--node-gap);
-  background-color: var(--connection-color);
-}
-
-.node-container:first-child::before {
-  display: none;
-}
-
+/* ----------------------------------------
+   Vertical Connection Lines
+   ---------------------------------------- */
 .children-container {
   display: flex;
   flex-direction: column;
@@ -32,62 +82,215 @@
   position: relative;
 }
 
+/* Vertical line from parent to children */
 .children-container::before {
   content: '';
   position: absolute;
   top: calc(-1 * var(--node-gap));
   left: 50%;
+  transform: translateX(-50%);
   width: var(--connection-width);
   height: var(--node-gap);
   background-color: var(--connection-color);
 }
+
+/* Connector dot at junction */
+.children-container::after {
+  content: '';
+  position: absolute;
+  top: calc(-1 * var(--node-gap) - 3px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 6px;
+  height: 6px;
+  background-color: var(--connection-color);
+  border-radius: 50%;
+}
+
+/* ========================================
+   Branch Layout
+   Horizontal split for conditional nodes
+   ======================================== */
 
 .branch-container {
   display: flex;
   gap: var(--branch-gap);
   margin-top: var(--node-gap);
   position: relative;
+  padding-top: 32px;
 }
 
+/* Vertical line from parent node down to horizontal bar */
 .branch-container::before {
   content: '';
   position: absolute;
-  top: calc(-1 * var(--node-gap) / 2);
-  left: 0;
-  right: 0;
+  top: calc(-1 * var(--node-gap));
+  left: 50%;
+  transform: translateX(-50%);
+  width: var(--connection-width);
+  height: calc(var(--node-gap) + 8px);
+  background-color: var(--connection-color);
+}
+
+/* Junction dot */
+.branch-container::after {
+  content: '';
+  position: absolute;
+  top: calc(-1 * var(--node-gap) - 3px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 6px;
+  height: 6px;
+  background-color: var(--connection-color);
+  border-radius: 50%;
+}
+
+/* Individual branch column */
+.branch {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  min-width: 240px;
+}
+
+/* Horizontal line extending from center to each branch */
+.branch::before {
+  content: '';
+  position: absolute;
+  top: -24px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: var(--connection-width);
+  height: 24px;
+  background-color: var(--connection-color);
+}
+
+/* Horizontal connector - left branch */
+.branch-container > .branch:first-child::after {
+  content: '';
+  position: absolute;
+  top: -24px;
+  left: 50%;
+  width: calc(50% + var(--branch-gap) / 2);
   height: var(--connection-width);
   background-color: var(--connection-color);
 }
 
-.branch {
+/* Horizontal connector - right branch */
+.branch-container > .branch:last-child::after {
+  content: '';
+  position: absolute;
+  top: -24px;
+  right: 50%;
+  width: calc(50% + var(--branch-gap) / 2);
+  height: var(--connection-width);
+  background-color: var(--connection-color);
+}
+
+/* Branch path labels */
+.branch-label {
+  padding: 5px 14px;
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-light);
+  color: var(--text-secondary);
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: var(--font-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: var(--spacing-md);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  position: relative;
+}
+
+.branch-label--true {
+  background-color: #ecfdf5;
+  border-color: #a7f3d0;
+  color: #059669;
+}
+
+.branch-label--false {
+  background-color: #fef2f2;
+  border-color: #fecaca;
+  color: #dc2626;
+}
+
+/* Branch nodes container */
+.branch-nodes {
   display: flex;
   flex-direction: column;
   align-items: center;
   position: relative;
 }
 
-.branch::before {
+/* Connector from label to first node */
+.branch-nodes::before {
   content: '';
   position: absolute;
-  top: calc(-1 * var(--node-gap) / 2);
+  top: -12px;
   left: 50%;
+  transform: translateX(-50%);
   width: var(--connection-width);
-  height: calc(var(--node-gap) / 2);
+  height: 12px;
   background-color: var(--connection-color);
 }
 
-.branch-label {
-  padding: 0.25rem 0.75rem;
-  background-color: var(--branch-color);
-  color: white;
-  border-radius: 9999px;
-  font-size: 0.75rem;
-  font-weight: 500;
-  margin-bottom: 1rem;
+/* Empty branch placeholder */
+.branch-nodes:empty::before {
+  display: none;
 }
 
-.branch-nodes {
+/* ========================================
+   Empty Branch Add Button
+   ======================================== */
+
+.add-node-btn--empty {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+  background-color: var(--bg-primary);
+  border: 2px dashed var(--border-default);
+  color: var(--text-muted);
+  font-size: var(--text-xl);
+  font-weight: 300;
   display: flex;
-  flex-direction: column;
   align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  margin-top: var(--spacing-sm);
+}
+
+.add-node-btn--empty:hover {
+  background-color: var(--primary-50);
+  border-color: var(--primary-400);
+  border-style: solid;
+  color: var(--primary-500);
+  transform: scale(1.05);
+}
+
+/* ========================================
+   Spacing & Visual Helpers
+   ======================================== */
+
+/* Ensure proper spacing between sibling nodes */
+.node-container + .node-container {
+  margin-top: var(--node-gap);
+}
+
+.branch-nodes > .node-container + .node-container {
+  margin-top: var(--node-gap);
+}
+
+/* Connection line between sibling nodes */
+.branch-nodes > .node-container + .node-container::before {
+  content: '';
+  position: absolute;
+  top: calc(-1 * var(--node-gap));
+  left: 50%;
+  transform: translateX(-50%);
+  width: var(--connection-width);
+  height: var(--node-gap);
+  background-color: var(--connection-color);
 }

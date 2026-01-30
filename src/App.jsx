@@ -14,7 +14,7 @@ function App() {
     saveWorkflow 
   } = useWorkflow();
 
-  const renderNode = (node, depth = 0) => {
+  const renderNode = (node, depth = 0, isFirst = false) => {
     if (!node) return null;
 
     return (
@@ -30,20 +30,29 @@ function App() {
           <div className="branch-container">
             {node.children.map((branch, index) => (
               <div key={`branch-${index}`} className="branch">
-                <div className="branch-label">
+                <span className={`branch-label ${index === 0 ? 'branch-label--true' : 'branch-label--false'}`}>
                   {index === 0 ? 'True' : 'False'}
-                </div>
+                </span>
                 <div className="branch-nodes">
-                  {branch.map((child) => renderNode(child, depth + 1))}
+                  {branch.map((child, childIndex) => renderNode(child, depth + 1, childIndex === 0))}
+                  {branch.length === 0 && (
+                    <button 
+                      className="add-node-btn add-node-btn--empty"
+                      onClick={() => addNode(node.id, 'action', index)}
+                      title="Add node to this branch"
+                    >
+                      +
+                    </button>
+                  )}
                 </div>
               </div>
             ))}
           </div>
         )}
         
-        {node.type !== 'branch' && node.children && node.children.length > 0 && (
+        {node.type !== 'branch' && node.type !== 'end' && node.children && node.children.length > 0 && (
           <div className="children-container">
-            {node.children.map((child) => renderNode(child, depth + 1))}
+            {node.children.map((child, index) => renderNode(child, depth + 1, index === 0))}
           </div>
         )}
       </div>
@@ -52,17 +61,29 @@ function App() {
 
   return (
     <div className="app">
-      <Controls
-        onSave={saveWorkflow}
-        onUndo={() => {}}
-        onRedo={() => {}}
-        canUndo={false}
-        canRedo={false}
-      />
+      <header className="app-header">
+        <div className="app-header__title">
+          <svg className="app-header__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M12 3v18M3 12h18M8 8l8 8M16 8l-8 8" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+          Workflow Builder
+        </div>
+        <Controls
+          onSave={saveWorkflow}
+          onUndo={() => {}}
+          onRedo={() => {}}
+          canUndo={false}
+          canRedo={false}
+        />
+      </header>
       
-      <WorkflowCanvas>
-        {renderNode(workflow)}
-      </WorkflowCanvas>
+      <div className="canvas-wrapper">
+        <WorkflowCanvas>
+          <div className="node-tree">
+            {renderNode(workflow, 0, true)}
+          </div>
+        </WorkflowCanvas>
+      </div>
     </div>
   );
 }
