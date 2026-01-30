@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { WorkflowCanvas } from './components/canvas';
 import { WorkflowNode } from './components/node';
 import { Controls } from './components/controls';
@@ -11,8 +11,29 @@ function App() {
     addNode, 
     deleteNode, 
     updateLabel, 
-    saveWorkflow 
+    saveWorkflow,
+    undo,
+    redo,
+    canUndo,
+    canRedo,
   } = useWorkflow();
+
+  // Keyboard shortcuts for undo/redo
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
+        e.preventDefault();
+        if (canUndo) undo();
+      }
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.key === 'z' && e.shiftKey))) {
+        e.preventDefault();
+        if (canRedo) redo();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [undo, redo, canUndo, canRedo]);
 
   const renderNode = (node, depth = 0, isFirst = false) => {
     if (!node) return null;
@@ -70,10 +91,10 @@ function App() {
         </div>
         <Controls
           onSave={saveWorkflow}
-          onUndo={() => {}}
-          onRedo={() => {}}
-          canUndo={false}
-          canRedo={false}
+          onUndo={undo}
+          onRedo={redo}
+          canUndo={canUndo}
+          canRedo={canRedo}
         />
       </header>
       
