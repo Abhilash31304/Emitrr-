@@ -30,42 +30,69 @@ const useNodePositions = (initialPositions = {}) => {
 
   const initializePositions = useCallback((workflow) => {
     const newPositions = {};
-    let yOffset = 80;
     
-    const processNode = (node, x = 400, y = yOffset, branchIndex = null) => {
-      if (!node) return y;
+    const processNode = (node, x = 500, y = 80, siblingIndex = 0, totalSiblings = 1) => {
+      if (!node) return { maxY: y, maxX: x };
+      
+      const nodeWidth = 280;
+      const nodeHeight = 120;
+      const verticalGap = 160;
+      const horizontalGap = 320;
       
       newPositions[node.id] = {
-        x: x - 140, // Center the node (assuming 280px width)
+        x: x - nodeWidth / 2,
         y,
-        width: 280,
-        height: 120,
+        width: nodeWidth,
+        height: nodeHeight,
       };
       
-      let nextY = y + 160; // Gap between nodes
+      let nextY = y + nodeHeight + verticalGap - 80;
+      let maxY = nextY;
+      let maxX = x;
       
       if (node.type === 'branch' && Array.isArray(node.children)) {
         // Handle branch children (True/False paths)
-        const branchSpacing = 320;
-        node.children.forEach((branch, index) => {
-          const branchX = x + (index === 0 ? -branchSpacing / 2 : branchSpacing / 2);
+        const numBranches = node.children.length;
+        const totalWidth = (numBranches - 1) * horizontalGap;
+        const startX = x - totalWidth / 2;
+        
+        node.children.forEach((branch, branchIdx) => {
+          const branchX = startX + branchIdx * horizontalGap;
           let branchY = nextY;
           
-          if (Array.isArray(branch)) {
-            branch.forEach((child) => {
-              branchY = processNode(child, branchX, branchY, index);
+          if (Array.isArray(branch) && branch.length > 0) {
+            branch.forEach((child, childIdx) => {
+              const result = processNode(child, branchX, branchY, childIdx, branch.length);
+              branchY = result.maxY;
+              maxX = Math.max(maxX, result.maxX);
             });
           }
-          nextY = Math.max(nextY, branchY);
+          maxY = Math.max(maxY, branchY);
         });
-      } else if (Array.isArray(node.children)) {
-        // Handle regular children
-        node.children.forEach((child) => {
-          nextY = processNode(child, x, nextY);
-        });
+      } else if (Array.isArray(node.children) && node.children.length > 0) {
+        // Handle multiple children - spread horizontally
+        const numChildren = node.children.length;
+        
+        if (numChildren === 1) {
+          // Single child - place directly below
+          const result = processNode(node.children[0], x, nextY, 0, 1);
+          maxY = result.maxY;
+          maxX = Math.max(maxX, result.maxX);
+        } else {
+          // Multiple children - spread horizontally
+          const totalWidth = (numChildren - 1) * horizontalGap;
+          const startX = x - totalWidth / 2;
+          
+          node.children.forEach((child, childIdx) => {
+            const childX = startX + childIdx * horizontalGap;
+            const result = processNode(child, childX, nextY, childIdx, numChildren);
+            maxY = Math.max(maxY, result.maxY);
+            maxX = Math.max(maxX, result.maxX);
+          });
+        }
       }
       
-      return nextY;
+      return { maxY, maxX };
     };
     
     processNode(workflow);

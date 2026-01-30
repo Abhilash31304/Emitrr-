@@ -177,10 +177,19 @@ const DraggableNode = ({
 
   const handleAddFromConnector = (type) => {
     onAddChild(node.id, type);
+    // Don't close menu so user can add multiple
+  };
+
+  const closeAddMenu = () => {
     setShowAddMenu(false);
   };
 
   const canAddChild = node.type !== 'end';
+  
+  // Count current children
+  const childCount = node.type === 'branch' 
+    ? node.children?.reduce((sum, branch) => sum + (branch?.length || 0), 0) || 0
+    : node.children?.length || 0;
 
   return (
     <div
@@ -257,10 +266,15 @@ const DraggableNode = ({
           className={`draggable-node__connector ${showAddMenu ? 'draggable-node__connector--active' : ''}`}
           ref={addMenuRef}
         >
+          {/* Child count badge */}
+          {childCount > 0 && !showAddMenu && (
+            <span className="draggable-node__child-count">{childCount}</span>
+          )}
+          
           <button
             className="draggable-node__add-btn"
             onClick={() => setShowAddMenu(!showAddMenu)}
-            title="Add next step"
+            title={`Add child node (${childCount} children)`}
             aria-label="Add next step"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
@@ -272,27 +286,38 @@ const DraggableNode = ({
           {/* Quick Add Menu */}
           {showAddMenu && (
             <div className="draggable-node__quick-menu">
-              <button 
-                className="draggable-node__quick-item draggable-node__quick-item--action"
-                onClick={() => handleAddFromConnector('action')}
-              >
-                <span className="draggable-node__quick-icon">⚡</span>
-                Action
-              </button>
-              <button 
-                className="draggable-node__quick-item draggable-node__quick-item--branch"
-                onClick={() => handleAddFromConnector('branch')}
-              >
-                <span className="draggable-node__quick-icon">◇</span>
-                Condition
-              </button>
-              <button 
-                className="draggable-node__quick-item draggable-node__quick-item--end"
-                onClick={() => handleAddFromConnector('end')}
-              >
-                <span className="draggable-node__quick-icon">■</span>
-                End
-              </button>
+              <div className="draggable-node__quick-header">
+                <span>Add child node</span>
+                <button className="draggable-node__quick-close" onClick={closeAddMenu}>×</button>
+              </div>
+              <div className="draggable-node__quick-items">
+                <button 
+                  className="draggable-node__quick-item draggable-node__quick-item--action"
+                  onClick={() => handleAddFromConnector('action')}
+                >
+                  <span className="draggable-node__quick-icon">⚡</span>
+                  Action
+                </button>
+                <button 
+                  className="draggable-node__quick-item draggable-node__quick-item--branch"
+                  onClick={() => handleAddFromConnector('branch')}
+                >
+                  <span className="draggable-node__quick-icon">◇</span>
+                  Condition
+                </button>
+                <button 
+                  className="draggable-node__quick-item draggable-node__quick-item--end"
+                  onClick={() => handleAddFromConnector('end')}
+                >
+                  <span className="draggable-node__quick-icon">■</span>
+                  End
+                </button>
+              </div>
+              {childCount > 0 && (
+                <div className="draggable-node__quick-footer">
+                  {childCount} child{childCount !== 1 ? 'ren' : ''} connected
+                </div>
+              )}
             </div>
           )}
         </div>
