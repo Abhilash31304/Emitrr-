@@ -7,6 +7,7 @@
   background-color: var(--bg-canvas);
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 /* ----------------------------------------
@@ -40,16 +41,107 @@
   color: var(--primary-500);
 }
 
+.app-header__controls {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+}
+
 /* ----------------------------------------
-   Canvas Wrapper
+   Zoom Controls
+   ---------------------------------------- */
+.zoom-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  background-color: var(--bg-secondary);
+  padding: 4px 8px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-light);
+}
+
+.zoom-btn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.zoom-btn:hover {
+  background-color: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.zoom-btn--reset {
+  font-size: 14px;
+}
+
+.zoom-level {
+  min-width: 48px;
+  text-align: center;
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--text-secondary);
+}
+
+/* ----------------------------------------
+   Canvas Wrapper - Infinite Canvas
    ---------------------------------------- */
 .canvas-wrapper {
   flex: 1;
-  padding: var(--spacing-xl) var(--spacing-xl) 60px;
+  position: relative;
+  overflow: hidden;
+  cursor: grab;
+  background-color: var(--bg-canvas);
+  background-image: 
+    radial-gradient(circle, var(--border-light) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.canvas-wrapper--panning {
+  cursor: grabbing;
+}
+
+.canvas-inner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 5000px;
+  height: 5000px;
+  will-change: transform;
+}
+
+/* ----------------------------------------
+   Canvas Instructions
+   ---------------------------------------- */
+.canvas-instructions {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  overflow: auto;
+  gap: var(--spacing-lg);
+  padding: 8px 16px;
+  background-color: rgba(255, 255, 255, 0.95);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-sm);
+  z-index: 50;
+}
+
+.canvas-instructions span {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  white-space: nowrap;
 }
 
 /* ========================================
@@ -92,6 +184,7 @@
   width: var(--connection-width);
   height: var(--node-gap);
   background-color: var(--connection-color);
+  pointer-events: none;
 }
 
 /* Connector dot at junction */
@@ -105,6 +198,7 @@
   height: 6px;
   background-color: var(--connection-color);
   border-radius: 50%;
+  pointer-events: none;
 }
 
 /* ========================================

@@ -1,0 +1,34 @@
+.edges-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+  overflow: visible;
+}
+
+.edge-group {
+  transition: opacity 0.2s ease;
+}
+
+.edge-path {
+  transition: stroke 0.2s ease, stroke-width 0.2s ease;
+}
+
+.edge-label {
+  font-size: 11px;
+  font-weight: 600;
+  fill: #64748b;
+  pointer-events: none;
+  user-select: none;
+}
+
+.edge-label--true {
+  fill: #16a34a;
+}
+
+.edge-label--false {
+  fill: #dc2626;
+}

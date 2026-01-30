@@ -1,0 +1,366 @@
+/* ========================================
+   Draggable Node Component
+   Movable and resizable workflow nodes
+   ======================================== */
+
+.draggable-node {
+  position: absolute;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-card);
+  cursor: grab;
+  user-select: none;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  overflow: visible;
+  z-index: 10;
+}
+
+.draggable-node:hover {
+  box-shadow: var(--shadow-elevated);
+  border-color: var(--border-default);
+  z-index: 20;
+}
+
+.draggable-node--dragging {
+  cursor: grabbing;
+  box-shadow: var(--shadow-xl), 0 0 0 2px var(--primary-200);
+  z-index: 1000 !important;
+  opacity: 0.95;
+}
+
+.draggable-node--resizing {
+  cursor: se-resize;
+  box-shadow: var(--shadow-xl), 0 0 0 2px var(--primary-200);
+}
+
+/* ----------------------------------------
+   Accent Bar (Top Color Strip)
+   ---------------------------------------- */
+.draggable-node__accent {
+  height: 4px;
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  flex-shrink: 0;
+}
+
+.draggable-node__accent--start {
+  background: linear-gradient(90deg, var(--success-400), var(--success-500));
+}
+
+.draggable-node__accent--action {
+  background: linear-gradient(90deg, var(--primary-400), var(--primary-500));
+}
+
+.draggable-node__accent--branch {
+  background: linear-gradient(90deg, var(--warning-400), var(--warning-500));
+}
+
+.draggable-node__accent--end {
+  background: linear-gradient(90deg, var(--neutral-400), var(--neutral-500));
+}
+
+/* ----------------------------------------
+   Node Body
+   ---------------------------------------- */
+.draggable-node__body {
+  padding: var(--spacing-3) var(--spacing-4);
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* ----------------------------------------
+   Header: Badge + Actions
+   ---------------------------------------- */
+.draggable-node__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-2);
+  flex-shrink: 0;
+}
+
+.draggable-node__badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  font-size: 10px;
+  font-weight: var(--font-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.draggable-node__badge--start {
+  background-color: var(--success-50);
+  color: var(--success-600);
+}
+
+.draggable-node__badge--action {
+  background-color: var(--primary-50);
+  color: var(--primary-600);
+}
+
+.draggable-node__badge--branch {
+  background-color: var(--warning-50);
+  color: var(--warning-600);
+}
+
+.draggable-node__badge--end {
+  background-color: var(--neutral-100);
+  color: var(--neutral-600);
+}
+
+.draggable-node__actions {
+  display: flex;
+  gap: var(--spacing-1);
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.draggable-node:hover .draggable-node__actions {
+  opacity: 1;
+}
+
+/* ----------------------------------------
+   Content: Title (Editable)
+   ---------------------------------------- */
+.draggable-node__content {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: flex-start;
+}
+
+.draggable-node__title-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-1) var(--spacing-2);
+  margin: calc(-1 * var(--spacing-1)) calc(-1 * var(--spacing-2));
+  background: none;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: text;
+  text-align: left;
+  transition: background-color var(--transition-fast);
+  width: 100%;
+}
+
+.draggable-node__title-btn:hover {
+  background-color: var(--bg-hover);
+}
+
+.draggable-node__title {
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.draggable-node__edit-hint {
+  color: var(--text-muted);
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.draggable-node__title-btn:hover .draggable-node__edit-hint {
+  opacity: 1;
+}
+
+.draggable-node__input {
+  width: 100%;
+  padding: var(--spacing-1) var(--spacing-2);
+  margin: calc(-1 * var(--spacing-1)) calc(-1 * var(--spacing-2));
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+  background-color: var(--bg-input);
+  border: 1px solid var(--primary-300);
+  border-radius: var(--radius-md);
+  outline: none;
+  box-shadow: var(--shadow-focus);
+  cursor: text;
+}
+
+/* ----------------------------------------
+   Footer: Description
+   ---------------------------------------- */
+.draggable-node__footer {
+  margin-top: auto;
+  padding-top: var(--spacing-2);
+  flex-shrink: 0;
+}
+
+.draggable-node__description {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+/* ----------------------------------------
+   Connector & Add Button
+   ---------------------------------------- */
+.draggable-node__connector {
+  position: absolute;
+  bottom: -16px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 100;
+}
+
+.draggable-node__connector--active {
+  z-index: 200;
+}
+
+.draggable-node__add-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: var(--primary-500);
+  border: 2px solid var(--primary-500);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transform: scale(0.8);
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-md);
+}
+
+.draggable-node:hover .draggable-node__add-btn,
+.draggable-node__connector--active .draggable-node__add-btn {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.draggable-node__add-btn:hover {
+  background-color: var(--primary-600);
+  border-color: var(--primary-600);
+  transform: scale(1.15);
+}
+
+/* Quick Add Menu */
+.draggable-node__quick-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-dropdown);
+  z-index: 300;
+}
+
+.draggable-node__quick-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 12px;
+  border-radius: var(--radius-md);
+  background: none;
+  border: 1px solid transparent;
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.draggable-node__quick-item:hover {
+  background-color: var(--bg-hover);
+}
+
+.draggable-node__quick-item--action:hover {
+  background-color: var(--primary-50);
+  border-color: var(--primary-200);
+  color: var(--primary-600);
+}
+
+.draggable-node__quick-item--branch:hover {
+  background-color: var(--warning-50);
+  border-color: var(--warning-100);
+  color: var(--warning-600);
+}
+
+.draggable-node__quick-item--end:hover {
+  background-color: var(--neutral-100);
+  border-color: var(--neutral-200);
+  color: var(--neutral-600);
+}
+
+.draggable-node__quick-icon {
+  font-size: 10px;
+}
+
+/* ----------------------------------------
+   Resize Handle
+   ---------------------------------------- */
+.draggable-node__resize-handle {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: se-resize;
+  color: var(--text-muted);
+  opacity: 0;
+  transition: opacity 0.2s ease, color 0.2s ease;
+  border-radius: 4px;
+}
+
+.draggable-node:hover .draggable-node__resize-handle {
+  opacity: 0.6;
+}
+
+.draggable-node__resize-handle:hover {
+  opacity: 1 !important;
+  color: var(--primary-500);
+  background-color: var(--primary-50);
+}
+
+/* ----------------------------------------
+   Drag Indicator
+   ---------------------------------------- */
+.draggable-node__drag-indicator {
+  position: absolute;
+  top: 50%;
+  left: 8px;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--border-default);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+.draggable-node:hover .draggable-node__drag-indicator {
+  opacity: 0.5;
+}
+
+.draggable-node--dragging .draggable-node__drag-indicator {
+  opacity: 1;
+  color: var(--primary-400);
+}

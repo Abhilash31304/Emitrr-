@@ -208,25 +208,26 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  z-index: 10;
+  z-index: 100;
+  pointer-events: auto;
 }
 
 .workflow-node__connector--bottom {
-  bottom: -8px;
+  bottom: -12px;
 }
 
 .workflow-node__connector--active {
-  z-index: 20;
+  z-index: 200;
 }
 
 /* Add button on connector */
 .workflow-node__add-btn {
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
   border-radius: var(--radius-full);
-  background-color: var(--bg-primary);
-  border: 2px solid var(--border-default);
-  color: var(--text-muted);
+  background-color: var(--primary-500);
+  border: 2px solid var(--primary-500);
+  color: white;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -234,7 +235,10 @@
   opacity: 0;
   transform: scale(0.8);
   transition: all var(--transition-normal);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-md);
+  pointer-events: auto;
+  position: relative;
+  z-index: 100;
 }
 
 .workflow-node__add-btn--visible {
@@ -243,18 +247,18 @@
 }
 
 .workflow-node__add-btn:hover {
-  background-color: var(--primary-500);
-  border-color: var(--primary-500);
-  color: var(--text-inverse);
-  transform: scale(1.1);
-  box-shadow: var(--shadow-md);
+  background-color: var(--primary-600);
+  border-color: var(--primary-600);
+  color: white;
+  transform: scale(1.15);
+  box-shadow: var(--shadow-lg);
 }
 
 .workflow-node__add-btn:focus-visible {
   outline: none;
-  background-color: var(--primary-500);
-  border-color: var(--primary-500);
-  color: var(--text-inverse);
+  background-color: var(--primary-600);
+  border-color: var(--primary-600);
+  color: white;
   box-shadow: var(--shadow-focus);
 }
 
@@ -272,6 +276,7 @@
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-dropdown);
   animation: quickMenuIn 0.15s ease-out;
+  z-index: 300;
 }
 
 @keyframes quickMenuIn {
