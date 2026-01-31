@@ -1,6 +1,6 @@
 import React, { useEffect, useCallback, useRef, useState } from 'react';
 import { DraggableNode } from './components/draggable-node';
-import { Edges } from './components/edges';
+import { Edges, EdgeInsertButtons } from './components/edges';
 import { Controls } from './components/controls';
 import useWorkflow from './hooks/useWorkflow';
 import useNodePositions from './hooks/useNodePositions';
@@ -37,6 +37,7 @@ function App() {
     addNode, 
     deleteNode, 
     updateLabel, 
+    insertNode,
     saveWorkflow,
     undo,
     redo,
@@ -207,6 +208,13 @@ function App() {
           {/* SVG Edges Layer */}
           <Edges workflow={workflow} positions={positions} />
           
+          {/* Edge Insert Buttons (HTML overlay for inserting nodes between edges) */}
+          <EdgeInsertButtons 
+            workflow={workflow} 
+            positions={positions} 
+            onInsertNode={insertNode}
+          />
+          
           {/* Draggable Nodes */}
           {allNodes.map((node) => (
             <DraggableNode
@@ -220,14 +228,6 @@ function App() {
               onSizeChange={updateSize}
             />
           ))}
-        </div>
-
-        {/* Canvas instructions */}
-        <div className="canvas-instructions">
-          <span>🖱️ Drag nodes to move</span>
-          <span>↔️ Resize from corner</span>
-          <span>Ctrl + Scroll to zoom</span>
-          <span>Click canvas to pan</span>
         </div>
       </div>
     </div>

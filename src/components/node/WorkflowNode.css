@@ -348,14 +348,211 @@
   border-color: var(--primary-500);
 }
 
-/* Branch Node */
+/* Branch Node - Diamond Shape */
 .workflow-node--branch {
-  min-width: 260px;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  min-width: auto;
+  max-width: none;
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.workflow-node--branch .workflow-node__add-btn:hover {
-  background-color: var(--warning-500);
+.workflow-node--branch:hover {
+  box-shadow: none;
+  border-color: transparent;
+}
+
+.workflow-node__diamond {
+  width: 140px;
+  height: 140px;
+  transform: rotate(45deg);
+  background-color: var(--bg-primary);
+  border: 2px solid var(--warning-400);
+  box-shadow: var(--shadow-node);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 
+    box-shadow var(--transition-normal),
+    border-color var(--transition-normal);
+}
+
+.workflow-node--branch:hover .workflow-node__diamond {
+  box-shadow: var(--shadow-node-hover);
   border-color: var(--warning-500);
+}
+
+.workflow-node__diamond-inner {
+  transform: rotate(-45deg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 100px;
+  padding: var(--spacing-2);
+}
+
+.workflow-node__diamond-label {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+  line-height: var(--leading-tight);
+  word-break: break-word;
+  max-width: 90px;
+}
+
+.workflow-node__diamond-edit-btn {
+  background: none;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  padding: var(--spacing-1) var(--spacing-2);
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  max-width: 90px;
+  word-break: break-word;
+}
+
+.workflow-node__diamond-edit-btn:hover {
+  background-color: var(--warning-50);
+  border-color: var(--warning-200);
+}
+
+.workflow-node__diamond-input {
+  width: 80px;
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+  text-align: center;
+  padding: var(--spacing-1);
+  border: 1px solid var(--warning-500);
+  border-radius: var(--radius-sm);
+  background-color: var(--bg-primary);
+  outline: none;
+}
+
+.workflow-node__diamond-type {
+  font-size: 9px;
+  font-weight: var(--font-medium);
+  color: var(--warning-600);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+  margin-top: var(--spacing-1);
+}
+
+/* Actions positioning for diamond */
+.workflow-node--branch .workflow-node__actions {
+  position: absolute;
+  top: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* ----------------------------------------
+   Branch Connectors (True/False paths)
+   ---------------------------------------- */
+.workflow-node__branch-connectors {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.workflow-node__branch-connector {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: auto;
+  z-index: 100;
+}
+
+.workflow-node__branch-connector--active {
+  z-index: 200;
+}
+
+/* True branch - Bottom of diamond */
+.workflow-node__branch-connector--true {
+  bottom: -50px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* False branch - Right of diamond */
+.workflow-node__branch-connector--false {
+  top: 50%;
+  right: -80px;
+  transform: translateY(-50%);
+  flex-direction: row;
+}
+
+/* Branch labels */
+.workflow-node__branch-label {
+  font-size: var(--text-xs);
+  font-weight: var(--font-semibold);
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+  margin-bottom: var(--spacing-1);
+}
+
+.workflow-node__branch-connector--false .workflow-node__branch-label {
+  margin-bottom: 0;
+  margin-right: var(--spacing-1);
+}
+
+.workflow-node__branch-label--true {
+  background-color: var(--success-50);
+  color: var(--success-600);
+  border: 1px solid var(--success-200);
+}
+
+.workflow-node__branch-label--false {
+  background-color: var(--error-50);
+  color: var(--error-600);
+  border: 1px solid var(--error-200);
+}
+
+/* Add button styling for branches */
+.workflow-node__add-btn--true:hover {
+  background-color: var(--success-500) !important;
+  border-color: var(--success-500) !important;
+}
+
+.workflow-node__add-btn--false:hover {
+  background-color: var(--error-500) !important;
+  border-color: var(--error-500) !important;
+}
+
+/* Quick menu positioning for branch connectors */
+.workflow-node__quick-menu--branch {
+  flex-direction: column;
+  min-width: 160px;
+}
+
+.workflow-node__quick-menu--right {
+  left: auto;
+  right: 0;
+  transform: translateX(0);
+}
+
+.workflow-node__quick-menu-header {
+  font-size: var(--text-xs);
+  font-weight: var(--font-semibold);
+  color: var(--text-muted);
+  padding: var(--spacing-2) var(--spacing-3);
+  border-bottom: 1px solid var(--border-light);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
 }
 
 /* Hovered state */

@@ -7,7 +7,8 @@ const NodeActions = ({ nodeId, nodeType, onAddNode, onDeleteNode }) => {
   const menuRef = useRef(null);
   const deleteTimeoutRef = useRef(null);
 
-  const canAddChild = nodeType !== 'end';
+  // For branch nodes, we don't show the add button here - it's on the branch connectors
+  const canAddChild = nodeType !== 'end' && nodeType !== 'branch';
   const canDelete = nodeType !== 'start';
 
   // Close menu on outside click

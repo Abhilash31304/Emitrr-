@@ -34,10 +34,10 @@ const useNodePositions = (initialPositions = {}) => {
     const processNode = (node, x = 500, y = 80, siblingIndex = 0, totalSiblings = 1) => {
       if (!node) return { maxY: y, maxX: x };
       
-      const nodeWidth = 280;
-      const nodeHeight = 120;
-      const verticalGap = 160;
-      const horizontalGap = 320;
+      const nodeWidth = node.type === 'branch' ? 160 : 280;
+      const nodeHeight = node.type === 'branch' ? 160 : 120;
+      const verticalGap = node.type === 'branch' ? 200 : 160;
+      const horizontalGap = 350;
       
       newPositions[node.id] = {
         x: x - nodeWidth / 2,
@@ -51,24 +51,45 @@ const useNodePositions = (initialPositions = {}) => {
       let maxX = x;
       
       if (node.type === 'branch' && Array.isArray(node.children)) {
-        // Handle branch children (True/False paths)
-        const numBranches = node.children.length;
-        const totalWidth = (numBranches - 1) * horizontalGap;
-        const startX = x - totalWidth / 2;
+        // Handle branch children (3 paths: left, bottom, right)
+        const leftChildren = node.children[0] || [];
+        const bottomChildren = node.children[1] || [];
+        const rightChildren = node.children[2] || [];
         
-        node.children.forEach((branch, branchIdx) => {
-          const branchX = startX + branchIdx * horizontalGap;
-          let branchY = nextY;
-          
-          if (Array.isArray(branch) && branch.length > 0) {
-            branch.forEach((child, childIdx) => {
-              const result = processNode(child, branchX, branchY, childIdx, branch.length);
-              branchY = result.maxY;
-              maxX = Math.max(maxX, result.maxX);
-            });
-          }
+        // Left branch - to the left
+        const leftX = x - horizontalGap;
+        let branchY = nextY;
+        if (leftChildren.length > 0) {
+          leftChildren.forEach((child) => {
+            const result = processNode(child, leftX, branchY, 0, 1);
+            branchY = result.maxY;
+            maxX = Math.max(maxX, result.maxX);
+          });
           maxY = Math.max(maxY, branchY);
-        });
+        }
+        
+        // Bottom branch - directly below
+        branchY = nextY;
+        if (bottomChildren.length > 0) {
+          bottomChildren.forEach((child) => {
+            const result = processNode(child, x, branchY, 0, 1);
+            branchY = result.maxY;
+            maxX = Math.max(maxX, result.maxX);
+          });
+          maxY = Math.max(maxY, branchY);
+        }
+        
+        // Right branch - to the right
+        const rightX = x + horizontalGap;
+        branchY = nextY;
+        if (rightChildren.length > 0) {
+          rightChildren.forEach((child) => {
+            const result = processNode(child, rightX, branchY, 0, 1);
+            branchY = result.maxY;
+            maxX = Math.max(maxX, result.maxX, rightX);
+          });
+          maxY = Math.max(maxY, branchY);
+        }
       } else if (Array.isArray(node.children) && node.children.length > 0) {
         // Handle multiple children - spread horizontally
         const numChildren = node.children.length;

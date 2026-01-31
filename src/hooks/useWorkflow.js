@@ -4,7 +4,8 @@ import {
   addNode, 
   deleteNode, 
   updateNodeLabel, 
-  findNodeById 
+  findNodeById,
+  insertNodeBetween,
 } from '../utils/workflowHelpers';
 import { initialWorkflow } from '../data/initialWorkflow';
 
@@ -44,7 +45,7 @@ const useWorkflow = () => {
         : nodeType === 'branch' 
           ? 'New Condition' 
           : 'End',
-      children: nodeType === 'branch' ? [[], []] : [],
+      children: nodeType === 'branch' ? [[], [], []] : [], // 3 branches: left, bottom, right
     };
 
     const newWorkflow = addNode(workflow, parentId, newNode, branchIndex);
@@ -58,6 +59,22 @@ const useWorkflow = () => {
 
   const handleUpdateLabel = useCallback((nodeId, newLabel) => {
     const newWorkflow = updateNodeLabel(workflow, nodeId, newLabel);
+    pushToHistory(newWorkflow);
+  }, [workflow, pushToHistory]);
+
+  const handleInsertNode = useCallback((parentId, targetId, nodeType, branchIndex = null) => {
+    const newNode = {
+      id: generateId(),
+      type: nodeType,
+      label: nodeType === 'action' 
+        ? 'New Action' 
+        : nodeType === 'branch' 
+          ? 'New Condition' 
+          : 'End',
+      children: nodeType === 'branch' ? [[], [], []] : [], // 3 branches: left, bottom, right
+    };
+
+    const newWorkflow = insertNodeBetween(workflow, parentId, targetId, newNode, branchIndex);
     pushToHistory(newWorkflow);
   }, [workflow, pushToHistory]);
 
@@ -90,6 +107,7 @@ const useWorkflow = () => {
     addNode: handleAddNode,
     deleteNode: handleDeleteNode,
     updateLabel: handleUpdateLabel,
+    insertNode: handleInsertNode,
     saveWorkflow: handleSave,
     undo: handleUndo,
     redo: handleRedo,

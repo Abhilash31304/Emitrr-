@@ -40,10 +40,15 @@ const DraggableNode = ({
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
   const [showAddMenu, setShowAddMenu] = useState(false);
+  const [showBranchMenu, setShowBranchMenu] = useState(null); // 0=left, 1=bottom, 2=right
+  const [isHovered, setIsHovered] = useState(false);
+  const [branchLabels, setBranchLabels] = useState(node.branchLabels || ['', '', '']);
+  const [editingBranchLabel, setEditingBranchLabel] = useState(null);
   
   const nodeRef = useRef(null);
   const inputRef = useRef(null);
   const addMenuRef = useRef(null);
+  const branchMenuRefs = useRef([null, null, null]);
   const dragStartRef = useRef({ x: 0, y: 0 });
   const resizeStartRef = useRef({ width: 0, height: 0, x: 0, y: 0 });
   
@@ -63,12 +68,22 @@ const DraggableNode = ({
       if (addMenuRef.current && !addMenuRef.current.contains(e.target)) {
         setShowAddMenu(false);
       }
+      // Check all branch menu refs
+      let clickedInsideMenu = false;
+      branchMenuRefs.current.forEach((ref) => {
+        if (ref && ref.contains(e.target)) {
+          clickedInsideMenu = true;
+        }
+      });
+      if (!clickedInsideMenu) {
+        setShowBranchMenu(null);
+      }
     };
-    if (showAddMenu) {
+    if (showAddMenu || showBranchMenu !== null) {
       document.addEventListener('mousedown', handleClickOutside);
     }
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [showAddMenu]);
+  }, [showAddMenu, showBranchMenu]);
 
   // Handle drag start
   const handleMouseDown = useCallback((e) => {
@@ -76,7 +91,10 @@ const DraggableNode = ({
         e.target.closest('.draggable-node__input') ||
         e.target.closest('.draggable-node__resize-handle') ||
         e.target.closest('.draggable-node__add-btn') ||
-        e.target.closest('.draggable-node__quick-menu')) {
+        e.target.closest('.draggable-node__quick-menu') ||
+        e.target.closest('.draggable-node__diamond-edit-btn') ||
+        e.target.closest('.draggable-node__diamond-input') ||
+        e.target.closest('.draggable-node__branch-connector')) {
       return;
     }
     
@@ -177,7 +195,12 @@ const DraggableNode = ({
 
   const handleAddFromConnector = (type) => {
     onAddChild(node.id, type);
-    // Don't close menu so user can add multiple
+    setShowAddMenu(false);
+  };
+
+  const handleAddToBranch = (type, branchIndex) => {
+    onAddChild(node.id, type, branchIndex);
+    setShowBranchMenu(null);
   };
 
   const closeAddMenu = () => {
@@ -190,6 +213,178 @@ const DraggableNode = ({
   const childCount = node.type === 'branch' 
     ? node.children?.reduce((sum, branch) => sum + (branch?.length || 0), 0) || 0
     : node.children?.length || 0;
+
+  // Handle branch label change
+  const handleBranchLabelChange = (index, value) => {
+    const newLabels = [...branchLabels];
+    newLabels[index] = value;
+    setBranchLabels(newLabels);
+  };
+
+  const handleBranchLabelKeyDown = (e, index) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      setEditingBranchLabel(null);
+    } else if (e.key === 'Escape') {
+      setEditingBranchLabel(null);
+      setShowBranchMenu(null);
+    }
+  };
+
+  // Helper to render branch connector
+  const renderBranchConnector = (index, positionClass, menuPositionClass = '') => {
+    const isMenuOpen = showBranchMenu === index;
+    const isEditingLabel = editingBranchLabel === index;
+    const hasLabel = branchLabels[index] && branchLabels[index].trim();
+    
+    return (
+      <div 
+        className={`draggable-node__branch-connector draggable-node__branch-connector--${positionClass} ${isMenuOpen ? 'draggable-node__branch-connector--active' : ''}`}
+        ref={(el) => branchMenuRefs.current[index] = el}
+      >
+        {/* Branch label badge */}
+        {hasLabel && !isMenuOpen && (
+          <span 
+            className="draggable-node__branch-label"
+            onClick={() => {
+              setShowBranchMenu(index);
+              setEditingBranchLabel(index);
+            }}
+            title="Click to edit label"
+          >
+            {branchLabels[index]}
+          </span>
+        )}
+        
+        <button
+          className={`draggable-node__add-btn ${isHovered || isMenuOpen ? 'draggable-node__add-btn--visible' : ''}`}
+          onClick={() => {
+            if (isMenuOpen) {
+              setShowBranchMenu(null);
+              setEditingBranchLabel(null);
+            } else {
+              setShowBranchMenu(index);
+              setEditingBranchLabel(index);
+            }
+          }}
+          title="Add node to this branch"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+        </button>
+
+        {isMenuOpen && (
+          <div className={`draggable-node__quick-menu draggable-node__quick-menu--branch ${menuPositionClass}`}>
+            <div className="draggable-node__quick-header">
+              <span>Add node</span>
+              <button className="draggable-node__quick-close" onClick={() => { setShowBranchMenu(null); setEditingBranchLabel(null); }}>×</button>
+            </div>
+            
+            {/* Branch label input */}
+            <div className="draggable-node__branch-label-input-wrapper">
+              <input
+                type="text"
+                className="draggable-node__branch-label-input"
+                placeholder="Label (e.g., Yes, No)"
+                value={branchLabels[index] || ''}
+                onChange={(e) => handleBranchLabelChange(index, e.target.value)}
+                onKeyDown={(e) => handleBranchLabelKeyDown(e, index)}
+                autoFocus={isEditingLabel}
+              />
+            </div>
+            
+            <div className="draggable-node__quick-items">
+              <button 
+                className="draggable-node__quick-item draggable-node__quick-item--action"
+                onClick={() => handleAddToBranch('action', index)}
+              >
+                <span className="draggable-node__quick-icon">⚡</span>
+                Action
+              </button>
+              <button 
+                className="draggable-node__quick-item draggable-node__quick-item--branch"
+                onClick={() => handleAddToBranch('branch', index)}
+              >
+                <span className="draggable-node__quick-icon">◇</span>
+                Condition
+              </button>
+              <button 
+                className="draggable-node__quick-item draggable-node__quick-item--end"
+                onClick={() => handleAddToBranch('end', index)}
+              >
+                <span className="draggable-node__quick-icon">■</span>
+                End
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  // Render diamond shape for branch/condition nodes
+  if (node.type === 'branch') {
+    return (
+      <div
+        ref={nodeRef}
+        className={`draggable-node draggable-node--branch ${isDragging ? 'draggable-node--dragging' : ''}`}
+        style={{
+          left: position.x,
+          top: position.y,
+          width: 160,
+          height: 160,
+        }}
+        onMouseDown={handleMouseDown}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
+        <div className="draggable-node__diamond">
+          <div className="draggable-node__diamond-inner">
+            <div className={`draggable-node__actions ${isHovered ? 'draggable-node__actions--visible' : ''}`}>
+              <NodeActions
+                nodeId={node.id}
+                nodeType={node.type}
+                onAddNode={onAddChild}
+                onDeleteNode={onDelete}
+              />
+            </div>
+            <span className="draggable-node__diamond-label">
+              {isEditing ? (
+                <input
+                  ref={inputRef}
+                  type="text"
+                  className="draggable-node__diamond-input"
+                  value={editValue}
+                  onChange={(e) => setEditValue(e.target.value)}
+                  onBlur={handleSave}
+                  onKeyDown={handleKeyDown}
+                  placeholder="Condition..."
+                />
+              ) : (
+                <button 
+                  className="draggable-node__diamond-edit-btn"
+                  onClick={handleStartEdit}
+                  title="Click to edit"
+                >
+                  {node.label}
+                </button>
+              )}
+            </span>
+            <span className="draggable-node__diamond-type">Condition</span>
+          </div>
+        </div>
+
+        {/* Branch connectors - Left, Bottom, Right */}
+        <div className="draggable-node__branch-connectors">
+          {renderBranchConnector(0, 'left', 'draggable-node__quick-menu--left')}
+          {renderBranchConnector(1, 'bottom', '')}
+          {renderBranchConnector(2, 'right', 'draggable-node__quick-menu--right')}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div

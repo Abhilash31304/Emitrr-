@@ -239,7 +239,8 @@
 }
 
 .draggable-node:hover .draggable-node__add-btn,
-.draggable-node__connector--active .draggable-node__add-btn {
+.draggable-node__connector--active .draggable-node__add-btn,
+.draggable-node__branch-connector .draggable-node__add-btn--visible {
   opacity: 1;
   transform: scale(1);
 }
@@ -437,4 +438,245 @@
 .draggable-node--dragging .draggable-node__drag-indicator {
   opacity: 1;
   color: var(--primary-400);
+}
+
+/* ========================================
+   Branch Node - Diamond Shape
+   ======================================== */
+.draggable-node--branch {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.draggable-node--branch:hover {
+  box-shadow: none;
+  border-color: transparent;
+}
+
+.draggable-node__diamond {
+  width: 120px;
+  height: 120px;
+  transform: rotate(45deg);
+  background-color: var(--bg-primary);
+  border: 2px solid var(--warning-400);
+  box-shadow: var(--shadow-card);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.draggable-node--branch:hover .draggable-node__diamond {
+  box-shadow: var(--shadow-elevated);
+  border-color: var(--warning-500);
+}
+
+.draggable-node__diamond-inner {
+  transform: rotate(-45deg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 90px;
+  padding: var(--spacing-1);
+}
+
+.draggable-node__diamond-label {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+  line-height: 1.2;
+  word-break: break-word;
+  max-width: 85px;
+}
+
+.draggable-node__diamond-edit-btn {
+  background: none;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  padding: 2px 6px;
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  max-width: 85px;
+  word-break: break-word;
+}
+
+.draggable-node__diamond-edit-btn:hover {
+  background-color: var(--warning-50);
+  border-color: var(--warning-200);
+}
+
+.draggable-node__diamond-input {
+  width: 75px;
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+  text-align: center;
+  padding: 2px 4px;
+  border: 1px solid var(--warning-500);
+  border-radius: var(--radius-sm);
+  background-color: var(--bg-primary);
+  outline: none;
+}
+
+.draggable-node__diamond-type {
+  font-size: 9px;
+  font-weight: var(--font-medium);
+  color: var(--warning-600);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 2px;
+}
+
+/* Actions positioning for diamond */
+.draggable-node--branch .draggable-node__actions {
+  position: absolute;
+  top: -25px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.draggable-node--branch .draggable-node__actions--visible {
+  opacity: 1;
+}
+
+/* ----------------------------------------
+   Branch Connectors (3-way: Left, Bottom, Right)
+   ---------------------------------------- */
+.draggable-node__branch-connectors {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.draggable-node__branch-connector {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: auto;
+  z-index: 100;
+}
+
+.draggable-node__branch-connector--active {
+  z-index: 200;
+}
+
+/* Left branch connector */
+.draggable-node__branch-connector--left {
+  top: 50%;
+  left: -40px;
+  transform: translateY(-50%);
+}
+
+/* Bottom branch connector */
+.draggable-node__branch-connector--bottom {
+  bottom: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Right branch connector */
+.draggable-node__branch-connector--right {
+  top: 50%;
+  right: -40px;
+  transform: translateY(-50%);
+}
+
+/* Quick menu positioning for branch connectors */
+.draggable-node__quick-menu--branch {
+  min-width: 160px;
+}
+
+.draggable-node__quick-menu--left {
+  left: auto;
+  right: 100%;
+  margin-right: 8px;
+  transform: translateX(0);
+}
+
+.draggable-node__quick-menu--right {
+  left: 100%;
+  right: auto;
+  margin-left: 8px;
+  transform: translateX(0);
+}
+
+/* Branch label input */
+.draggable-node__branch-label-input-wrapper {
+  padding: var(--spacing-2) var(--spacing-2) 0;
+}
+
+.draggable-node__branch-label-input {
+  width: 100%;
+  padding: var(--spacing-2) var(--spacing-2);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  font-size: var(--text-xs);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.draggable-node__branch-label-input:focus {
+  border-color: var(--primary-400);
+  box-shadow: 0 0 0 2px var(--primary-100);
+}
+
+.draggable-node__branch-label-input::placeholder {
+  color: var(--text-muted);
+}
+
+/* Branch label badge shown when label exists */
+.draggable-node__branch-label {
+  position: absolute;
+  padding: 2px 8px;
+  background: var(--warning-100);
+  color: var(--warning-700);
+  font-size: 10px;
+  font-weight: var(--font-semibold);
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  z-index: 50;
+}
+
+.draggable-node__branch-label:hover {
+  background: var(--warning-200);
+}
+
+/* Position labels based on connector position */
+.draggable-node__branch-connector--left .draggable-node__branch-label {
+  right: 35px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.draggable-node__branch-connector--bottom .draggable-node__branch-label {
+  bottom: 35px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.draggable-node__branch-connector--right .draggable-node__branch-label {
+  left: 35px;
+  top: 50%;
+  transform: translateY(-50%);
 }

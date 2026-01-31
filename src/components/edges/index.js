@@ -1,1 +1,1 @@
-export { default as Edges } from './Edges';
+export { default as Edges, EdgeInsertButtons } from './Edges';

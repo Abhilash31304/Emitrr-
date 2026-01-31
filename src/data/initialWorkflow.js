@@ -21,6 +21,7 @@ export const NODE_TYPES = {
 
 /**
  * Example workflow structure for reference
+ * Branch nodes now have 3 branches: [left, bottom, right]
  */
 export const exampleWorkflow = {
   id: 'start_node',
@@ -35,9 +36,18 @@ export const exampleWorkflow = {
         {
           id: 'branch_1',
           type: 'branch',
-          label: 'Is Valid?',
+          label: 'Check Status',
           children: [
-            // True branch
+            // Left branch (index 0)
+            [
+              {
+                id: 'end_1',
+                type: 'end',
+                label: 'End (Error)',
+                children: [],
+              },
+            ],
+            // Bottom/Center branch (index 1)
             [
               {
                 id: 'action_2',
@@ -45,7 +55,7 @@ export const exampleWorkflow = {
                 label: 'Process Data',
                 children: [
                   {
-                    id: 'end_1',
+                    id: 'end_2',
                     type: 'end',
                     label: 'End (Success)',
                     children: [],
@@ -53,12 +63,12 @@ export const exampleWorkflow = {
                 ],
               },
             ],
-            // False branch
+            // Right branch (index 2)
             [
               {
-                id: 'end_2',
+                id: 'end_3',
                 type: 'end',
-                label: 'End (Failed)',
+                label: 'End (Pending)',
                 children: [],
               },
             ],

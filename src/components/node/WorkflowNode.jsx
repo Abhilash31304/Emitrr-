@@ -26,8 +26,12 @@ const WorkflowNode = ({ node, onEdit, onDelete, onAddChild }) => {
   const [editValue, setEditValue] = useState(node.label);
   const [isHovered, setIsHovered] = useState(false);
   const [showAddMenu, setShowAddMenu] = useState(false);
+  const [showTrueBranchMenu, setShowTrueBranchMenu] = useState(false);
+  const [showFalseBranchMenu, setShowFalseBranchMenu] = useState(false);
   const inputRef = useRef(null);
   const addMenuRef = useRef(null);
+  const trueBranchMenuRef = useRef(null);
+  const falseBranchMenuRef = useRef(null);
   const config = NODE_CONFIG[node.type] || NODE_CONFIG.action;
 
   // Focus and select input when editing starts
@@ -44,12 +48,18 @@ const WorkflowNode = ({ node, onEdit, onDelete, onAddChild }) => {
       if (addMenuRef.current && !addMenuRef.current.contains(e.target)) {
         setShowAddMenu(false);
       }
+      if (trueBranchMenuRef.current && !trueBranchMenuRef.current.contains(e.target)) {
+        setShowTrueBranchMenu(false);
+      }
+      if (falseBranchMenuRef.current && !falseBranchMenuRef.current.contains(e.target)) {
+        setShowFalseBranchMenu(false);
+      }
     };
-    if (showAddMenu) {
+    if (showAddMenu || showTrueBranchMenu || showFalseBranchMenu) {
       document.addEventListener('mousedown', handleClickOutside);
     }
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [showAddMenu]);
+  }, [showAddMenu, showTrueBranchMenu, showFalseBranchMenu]);
 
   const handleStartEdit = () => {
     setIsEditing(true);
@@ -80,6 +90,168 @@ const WorkflowNode = ({ node, onEdit, onDelete, onAddChild }) => {
   };
 
   const canAddChild = node.type !== 'end';
+
+  // Handle adding to a specific branch (for branch nodes)
+  const handleAddToBranch = (type, branchIndex) => {
+    onAddChild(node.id, type, branchIndex);
+    setShowAddMenu(false);
+    setShowTrueBranchMenu(false);
+    setShowFalseBranchMenu(false);
+  };
+
+  // Render diamond shape for branch/condition nodes
+  if (node.type === 'branch') {
+    return (
+      <div 
+        className={`workflow-node workflow-node--branch ${isHovered ? 'workflow-node--hovered' : ''}`}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => {
+          setIsHovered(false);
+          setShowTrueBranchMenu(false);
+          setShowFalseBranchMenu(false);
+        }}
+      >
+        <div className="workflow-node__diamond">
+          <div className="workflow-node__diamond-inner">
+            <div className={`workflow-node__actions ${isHovered ? 'workflow-node__actions--visible' : ''}`}>
+              <NodeActions
+                nodeId={node.id}
+                nodeType={node.type}
+                onAddNode={onAddChild}
+                onDeleteNode={onDelete}
+              />
+            </div>
+            <span className="workflow-node__diamond-label">
+              {isEditing ? (
+                <input
+                  ref={inputRef}
+                  type="text"
+                  className="workflow-node__diamond-input"
+                  value={editValue}
+                  onChange={(e) => setEditValue(e.target.value)}
+                  onBlur={handleSave}
+                  onKeyDown={handleKeyDown}
+                  placeholder="Condition..."
+                />
+              ) : (
+                <button 
+                  className="workflow-node__diamond-edit-btn"
+                  onClick={handleStartEdit}
+                  title="Click to edit"
+                >
+                  {node.label}
+                </button>
+              )}
+            </span>
+            <span className="workflow-node__diamond-type">Condition</span>
+          </div>
+        </div>
+
+        {/* Branch connectors - True (bottom) and False (right) */}
+        <div className="workflow-node__branch-connectors">
+          {/* True Branch - Bottom */}
+          <div 
+            className={`workflow-node__branch-connector workflow-node__branch-connector--true ${showTrueBranchMenu ? 'workflow-node__branch-connector--active' : ''}`}
+            ref={trueBranchMenuRef}
+          >
+            <span className="workflow-node__branch-label workflow-node__branch-label--true">Yes</span>
+            <button
+              className={`workflow-node__add-btn workflow-node__add-btn--true ${isHovered || showTrueBranchMenu ? 'workflow-node__add-btn--visible' : ''}`}
+              onClick={() => {
+                setShowTrueBranchMenu(!showTrueBranchMenu);
+                setShowFalseBranchMenu(false);
+              }}
+              title="Add step to 'Yes' branch"
+              aria-label="Add step to Yes branch"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+            </button>
+
+            {/* True Branch Quick Add Menu */}
+            {showTrueBranchMenu && (
+              <div className="workflow-node__quick-menu workflow-node__quick-menu--branch">
+                <div className="workflow-node__quick-menu-header">Add to 'Yes' branch</div>
+                <button 
+                  className="workflow-node__quick-item workflow-node__quick-item--action"
+                  onClick={() => handleAddToBranch('action', 0)}
+                >
+                  <span className="workflow-node__quick-icon">⚡</span>
+                  Action
+                </button>
+                <button 
+                  className="workflow-node__quick-item workflow-node__quick-item--branch"
+                  onClick={() => handleAddToBranch('branch', 0)}
+                >
+                  <span className="workflow-node__quick-icon">◇</span>
+                  Condition
+                </button>
+                <button 
+                  className="workflow-node__quick-item workflow-node__quick-item--end"
+                  onClick={() => handleAddToBranch('end', 0)}
+                >
+                  <span className="workflow-node__quick-icon">■</span>
+                  End
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* False Branch - Right */}
+          <div 
+            className={`workflow-node__branch-connector workflow-node__branch-connector--false ${showFalseBranchMenu ? 'workflow-node__branch-connector--active' : ''}`}
+            ref={falseBranchMenuRef}
+          >
+            <span className="workflow-node__branch-label workflow-node__branch-label--false">No</span>
+            <button
+              className={`workflow-node__add-btn workflow-node__add-btn--false ${isHovered || showFalseBranchMenu ? 'workflow-node__add-btn--visible' : ''}`}
+              onClick={() => {
+                setShowFalseBranchMenu(!showFalseBranchMenu);
+                setShowTrueBranchMenu(false);
+              }}
+              title="Add step to 'No' branch"
+              aria-label="Add step to No branch"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+            </button>
+
+            {/* False Branch Quick Add Menu */}
+            {showFalseBranchMenu && (
+              <div className="workflow-node__quick-menu workflow-node__quick-menu--branch workflow-node__quick-menu--right">
+                <div className="workflow-node__quick-menu-header">Add to 'No' branch</div>
+                <button 
+                  className="workflow-node__quick-item workflow-node__quick-item--action"
+                  onClick={() => handleAddToBranch('action', 1)}
+                >
+                  <span className="workflow-node__quick-icon">⚡</span>
+                  Action
+                </button>
+                <button 
+                  className="workflow-node__quick-item workflow-node__quick-item--branch"
+                  onClick={() => handleAddToBranch('branch', 1)}
+                >
+                  <span className="workflow-node__quick-icon">◇</span>
+                  Condition
+                </button>
+                <button 
+                  className="workflow-node__quick-item workflow-node__quick-item--end"
+                  onClick={() => handleAddToBranch('end', 1)}
+                >
+                  <span className="workflow-node__quick-icon">■</span>
+                  End
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div 
